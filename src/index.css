@@ -1,0 +1,9 @@
+@import-normalize; /* добавить стили Normalize.css */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* font-size: 10px; */
+    font-family: Arial, Verdana, Tahoma, sans-serif;
+}
