@@ -1,29 +1,41 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./App.css";
 import Table from "./components/ui/Table";
 
 function App() {
-  
+  const [userData, setUserData] = useState([]);
 
-  async function fetcher() {
-    try {
-      const response = await fetch("https://dummyjson.com/users");
-      const data = await response.json();
-      const mas = []; // создаем пустой массив
-
-      mas.push(data);
-
-      console.log(mas[0].users[0].lastName);
-      return mas // возвращаем массив для дальнейшего использования
-    } catch (error) {
-      console.log(error);
-      return null; // в случае ошибки возвращаем null
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch("https://dummyjson.com/users");
+        const data = await response.json();
+        setUserData(data.users);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }
 
-  fetcher();
+    fetchData();
+  }, []);
 
-  const theadData = ["Name", "Email", "Date"];
+  const theadData = ["ФИО", "Возраст", "Пол", "Номер телефона", "Адрес"];
+
+  // Функция, которая преобразует данные пользователя в нужный формат для таблицы
+  const formatUserDataForTable = () => {
+    return userData.map((user) => ({
+      id: user.id,
+      items: [
+        `${user.firstName} ${user.lastName}`,
+        user.age,
+        user.gender,
+        user.phone,
+        `${user.address.city}, ${user.address.street}`,
+      ],
+    }));
+  };
+
+  // const theadData = ["Name", "Email", "Date"];
 
   const tbodyData = [
     {
@@ -47,7 +59,7 @@ function App() {
         <input type="text" placeholder="Поиск элемента" />
         <Table
           theadData={theadData}
-          tbodyData={tbodyData}
+          tbodyData={formatUserDataForTable()}
           customClass={"main-table"}
         />
       </div>

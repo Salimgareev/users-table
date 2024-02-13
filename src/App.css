@@ -12,8 +12,8 @@
 }
 
 .container {
-  width: 1200px;
-  height: 600px;
+  min-width: 1000px;
+  max-width: 1200px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,15 +27,35 @@ h1 {
   color: white;
 }
 
-input{
-    width: 350px;
-    height: 30px;
-    border-radius: 5px;
-    font-size: 16px;
-    border: none;
-    padding: 5px;
+input {
+  width: 350px;
+  height: 30px;
+  border-radius: 5px;
+  font-size: 16px;
+  border: none;
+  padding: 5px;
 }
 
-.main-table{
+.main-table {
   color: white;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.main-table td,
+.main-table th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.main-table tr:nth-child(even) {
+  background-color: #04aa6d;
+  color: black;
+}
+
+@media screen and (max-width: 600px) {
+  .main-table {
+    width: 100%;
+  }
 }
