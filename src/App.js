@@ -23,7 +23,13 @@ function App() {
     fetchData();
   }, []);
 
-  const theadData = ["Имя Фамилия", "Возраст", "Пол", "Номер телефона", "Адрес"];
+  const theadData = [
+    "Имя Фамилия",
+    "Возраст",
+    "Пол",
+    "Номер телефона",
+    "Адрес",
+  ];
 
   // Функция, которая преобразует данные пользователя в нужный формат для таблицы
   const formatUserDataForTable = () => {
@@ -41,18 +47,75 @@ function App() {
 
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState();
-  const debounceSearch = useDebounce(search, 500);
+  const debounceSearch = useDebounce(search, 600);
 
   useEffect(() => {
     async function fetchNewData() {
       setLoading(true);
       let url;
+      let queryKey;
+      let queryValue;
+
       if (debounceSearch.trim() === "") {
         // Если строка поиска пустая, делаем запрос без фильтрации
         url = "https://dummyjson.com/users";
       } else {
-        url = `https://dummyjson.com/users/filter?key=firstName&value=${debounceSearch}`;
+        // Проверяем введенные данные
+        if (
+          !isNaN(debounceSearch.trim()) &&
+          Number(debounceSearch.trim()) >= 1 &&
+          Number(debounceSearch.trim()) <= 500
+        ) {
+          // Если введено число от 1 до 500, считаем это возрастом
+          queryKey = "age";
+          queryValue = Number(debounceSearch.trim());
+        } else if (
+          debounceSearch.trim() === "male" ||
+          debounceSearch.trim() === "female"
+        ) {
+          // Если введено "male" или "female", считаем это полом
+          queryKey = "gender";
+          queryValue = debounceSearch.trim();
+        } else {
+          // В остальных случаях считаем, что введено имя или фамилия
+          // Отправляем два запроса - один с именем, другой с фамилией
+          let firstName = "";
+          let lastName = "";
+          if (debounceSearch.trim().includes(" ")) {
+            [firstName, lastName] = debounceSearch.trim().split(" ");
+          } else {
+            firstName = debounceSearch.trim();
+            lastName = firstName;
+          }
+
+          if (firstName !== lastName) {
+            const firstNameResponse = await fetch(
+              `https://dummyjson.com/users/filter?key=firstName&value=${firstName}`
+            );
+            const firstNameData = await firstNameResponse.json();
+            setUserData(firstNameData.users);
+            setLoading(false);
+            return;
+          }
+
+          const firstNameResponse = await fetch(
+            `https://dummyjson.com/users/filter?key=firstName&value=${firstName}`
+          );
+          const firstNameData = await firstNameResponse.json();
+          const lastNameResponse = await fetch(
+            `https://dummyjson.com/users/filter?key=lastName&value=${lastName}`
+          );
+          const lastNameData = await lastNameResponse.json();
+          // Объединяем данные из двух запросов
+          const combinedData = firstNameData.users.concat(lastNameData.users);
+          setUserData(combinedData);
+          setLoading(false);
+          return;
+        }
+        // Формируем URL запроса в зависимости от определенного типа данных
+        url = `https://dummyjson.com/users/filter?key=${queryKey}&value=${queryValue}`;
       }
+      // Отправляем запрос
       const response = await fetch(url);
       const data = await response.json();
       setUserData(data.users);
