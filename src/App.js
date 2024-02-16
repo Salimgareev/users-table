@@ -81,7 +81,11 @@ function App() {
           // Отправляем два запроса - один с именем, другой с фамилией
           let firstName = "";
           let lastName = "";
-          if (debounceSearch.trim().includes(" ")) {
+          // Если строка содержит внутри пробел, но не содержит цифр
+          if (
+            /\s/.test(debounceSearch.trim()) &&
+            !/\d/.test(debounceSearch.trim())
+          ) {
             [firstName, lastName] = debounceSearch.trim().split(" ");
           } else {
             firstName = debounceSearch.trim();
@@ -108,6 +112,18 @@ function App() {
           const lastNameData = await lastNameResponse.json();
           // Объединяем данные из двух запросов
           const combinedData = firstNameData.users.concat(lastNameData.users);
+
+          if (combinedData.length === 0) {
+            const address = debounceSearch.trim();
+            const addressCityResponse = await fetch(
+              `https://dummyjson.com/users/filter?key=address.city&value=${address}`
+            );
+            const addressCityData = await addressCityResponse.json();
+            setUserData(addressCityData.users);
+            setLoading(false);
+            return;
+          }
+
           setUserData(combinedData);
           setLoading(false);
           return;
