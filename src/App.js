@@ -23,7 +23,7 @@ function App() {
     fetchData();
   }, []);
 
-  const theadData = ["ФИО", "Возраст", "Пол", "Номер телефона", "Адрес"];
+  const theadData = ["Имя Фамилия", "Возраст", "Пол", "Номер телефона", "Адрес"];
 
   // Функция, которая преобразует данные пользователя в нужный формат для таблицы
   const formatUserDataForTable = () => {
@@ -34,7 +34,7 @@ function App() {
         user.age,
         user.gender,
         user.phone,
-        `${user.address.city}, ${user.address.street}`,
+        `${user.address.city}, ${user.address.address}`,
       ],
     }));
   };
